@@ -11,13 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import mongoengine
 
-# Connect to MongoDB
-mongoengine.connect(
-    db="expense_db",
-    host="mongodb://localhost:27017/expense_db"  # or Atlas connection string
-)
+
+
+
 
 
 
@@ -87,11 +84,16 @@ WSGI_APPLICATION = 'expense_project.wsgi.application'
 # expense_project/settings.py
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",   # This is your SQLite database file
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "expense_db",         # your database name
+        "USER": "root",               # your MySQL username
+        "PASSWORD": "Chandra@2001",   # your MySQL password
+        "HOST": "localhost",
+        "PORT": "3306",
     }
 }
+
 
 
 

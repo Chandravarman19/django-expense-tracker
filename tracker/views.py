@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
+from django.db import models
 
 
 # ✅ List all expenses (with category + date filter)
@@ -39,12 +40,13 @@ def add_expense(request):
         form = ExpenseForm(request.POST)
         if form.is_valid():
             expense = Expense(
-                title=form.cleaned_data['title'],
-                amount=form.cleaned_data['amount'],
-                category=form.cleaned_data['category'],
-                owner=request.user   # ✅ must be User object
+             title=form.cleaned_data['title'],
+             amount=form.cleaned_data['amount'],
+             category=form.cleaned_data['category'],
+              owner=request.user.username  # store username
             )
             expense.save()
+
             return redirect('expense_list')
     else:
         form = ExpenseForm()
@@ -90,16 +92,20 @@ def delete_expense(request, obj_id):
 def monthly_summary(request):
     summary = (
         Expense.objects.filter(owner=request.user)
-        .values('category')
-        .annotate(total=models.Sum('amount'))
+        .values('category')                 # group by category
+        .annotate(total=models.Sum('amount'))  # ✅ use models.Sum
     )
 
-    total_expenses = sum(item["total"] for item in summary) if summary else 0
+    total_expenses = (
+        Expense.objects.filter(owner=request.user)
+        .aggregate(total=models.Sum('amount'))['total']
+    )
 
     return render(request, 'tracker/monthly_summary.html', {
         'summary': summary,
         'total_expenses': total_expenses
     })
+
 
 
 # ✅ User Registration

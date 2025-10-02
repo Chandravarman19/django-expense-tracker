@@ -24,13 +24,13 @@
                                 <tr>
                                     <td>
                                         <span class="badge 
-                                            {% if item._id == 'Food' %} bg-danger 
-                                            {% elif item._id == 'Travel' %} bg-primary
-                                            {% elif item._id == 'Bills' %} bg-warning text-dark
-                                            {% elif item._id == 'Shopping' %} bg-success
+                                            {% if item.category == 'Food' %} bg-danger 
+                                            {% elif item.category == 'Travel' %} bg-primary
+                                            {% elif item.category == 'Bills' %} bg-warning text-dark
+                                            {% elif item.category == 'Shopping' %} bg-success
                                             {% else %} bg-info text-dark
                                             {% endif %}">
-                                            {{ item._id }}
+                                            {{ item.category }}
                                         </span>
                                     </td>
                                     <td><strong>₹{{ item.total }}</strong></td>
