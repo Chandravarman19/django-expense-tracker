@@ -11,6 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import mongoengine
+
+# Connect to MongoDB
+mongoengine.connect(
+    db="expense_db",
+    host="mongodb://localhost:27017/expense_db"  # or Atlas connection string
+)
+
 
 
 

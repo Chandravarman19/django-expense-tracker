@@ -1,7 +1,5 @@
 from django import forms
-from .models import Expense
 
-class ExpenseForm(forms.ModelForm):
-    class Meta:
-        model = Expense
-        fields = ['title', 'amount']   # removed date
+class ExpenseForm(forms.Form):
+    title = forms.CharField(max_length=200)
+    amount = forms.DecimalField(decimal_places=2, max_digits=10)

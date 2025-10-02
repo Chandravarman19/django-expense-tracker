@@ -25,8 +25,9 @@
             <td class="fw-bold text-success">₹{{ expense.amount }}</td>
             <td>{{ expense.date|date:"M d, Y" }}</td>
             <td class="text-center">
-                <a href="{% url 'edit_expense' expense.id %}" class="btn btn-sm btn-warning me-2">✏️ Edit</a>
-                <a href="{% url 'delete_expense' expense.id %}" class="btn btn-sm btn-danger">🗑️ Delete</a>
+                <!-- ✅ Convert ObjectId to string -->
+                <a href="{% url 'edit_expense' expense.id|stringformat:'s' %}" class="btn btn-sm btn-warning me-2">✏️ Edit</a>
+                <a href="{% url 'delete_expense' expense.id|stringformat:'s' %}" class="btn btn-sm btn-danger">🗑️ Delete</a>
             </td>
         </tr>
         {% endfor %}
