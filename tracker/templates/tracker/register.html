@@ -1,3 +1,5 @@
+{% load widget_tweaks %}
+
 {% extends 'tracker/base.html' %}
 
 {% block title %}Register{% endblock %}
@@ -14,28 +16,32 @@
                     <form method="POST">
                         {% csrf_token %}
                         
-                        <!-- Render Django form fields nicely -->
+                        <!-- Username -->
                         <div class="mb-3">
-                            {{ form.username.label_tag }}
-                            {{ form.username }}
+                            <label class="form-label">{{ form.username.label }}</label>
+                            {{ form.username|add_class:"form-control" }}
                         </div>
+
+                        <!-- Password -->
                         <div class="mb-3">
-                            {{ form.password1.label_tag }}
-                            {{ form.password1 }}
+                            <label class="form-label">{{ form.password1.label }}</label>
+                            {{ form.password1|add_class:"form-control" }}
                         </div>
+
+                        <!-- Confirm Password -->
                         <div class="mb-3">
-                            {{ form.password2.label_tag }}
-                            {{ form.password2 }}
+                            <label class="form-label">{{ form.password2.label }}</label>
+                            {{ form.password2|add_class:"form-control" }}
                         </div>
 
                         <div class="d-flex justify-content-between mt-3">
-                            <a href="{% url 'login' %}" class="btn btn-link">🔑 Already have an account? Login</a>
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary">🔑 Login</a>
                             <button type="submit" class="btn btn-success">Register ✅</button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Show success or error messages -->
+                <!-- Messages -->
                 {% if messages %}
                 <div class="card-footer">
                     {% for message in messages %}
