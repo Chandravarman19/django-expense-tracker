@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+</head>
+<body>
+    <h1>Expense List</h1>
+
+    {% if expenses %}
+        <ul>
+            {% for expense in expenses %}
+                <li>
+                    {{ expense.title }} - ₹{{ expense.amount }} ({{ expense.date }})
+                    | <a href="{% url 'edit_expense' expense.id %}">Edit</a>
+                    | <a href="{% url 'delete_expense' expense.id %}">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No expenses added yet.</p>
+    {% endif %}
+
+    <a href="{% url 'add_expense' %}">➕ Add New Expense</a>
+    <br>
+<a href="{% url 'monthly_summary' %}">📊 View Monthly Summary</a>
+
+</body>
+</html>

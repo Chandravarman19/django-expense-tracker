@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Summary</title>
+</head>
+<body>
+    <h1>📊 Monthly Summary</h1>
+
+    {% if summary %}
+        <ul>
+            {% for item in summary %}
+                <li>{{ item.title }} → ₹{{ item.total }}</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Total Expenses:</strong> ₹{{ total_expenses }}</p>
+    {% else %}
+        <p>No expenses found.</p>
+    {% endif %}
+
+    <a href="{% url 'expense_list' %}">⬅ Back to Expense List</a>
+</body>
+</html>
