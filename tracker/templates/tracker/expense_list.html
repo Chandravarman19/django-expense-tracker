@@ -4,14 +4,15 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Your Expenses</h1>
+    <h1 class="fw-bold">📒 Your Expenses</h1>
     <a href="{% url 'add_expense' %}" class="btn btn-success">➕ Add Expense</a>
 </div>
 
 <!-- ✅ Filters -->
-<form method="get" class="mb-4 row g-2">
+<form method="get" class="row g-2 mb-4 p-3 border rounded shadow-sm bg-light">
     <!-- Category Filter -->
     <div class="col-md-3">
+        <label class="form-label fw-bold">Category</label>
         <select name="category" class="form-select">
             <option value="">All Categories</option>
             <option value="Food" {% if selected_category == "Food" %}selected{% endif %}>🍔 Food</option>
@@ -24,11 +25,13 @@
 
     <!-- Date Filter -->
     <div class="col-md-3">
+        <label class="form-label fw-bold">From Date</label>
         <input type="date" name="date" value="{{ selected_date }}" class="form-control">
     </div>
 
-    <div class="col-md-3 d-flex gap-2">
-        <button type="submit" class="btn btn-primary">🔍 Filter</button>
+    <!-- Filter Buttons -->
+    <div class="col-md-3 d-flex align-items-end gap-2">
+        <button type="submit" class="btn btn-primary">🔍 Apply</button>
         <a href="{% url 'expense_list' %}" class="btn btn-secondary">Reset</a>
     </div>
 </form>
@@ -47,7 +50,7 @@
     <tbody>
         {% for expense in expenses %}
         <tr>
-            <td>{{ expense.title }}</td>
+            <td class="fw-bold">{{ expense.title }}</td>
             <td>
                 <span class="badge 
                     {% if expense.category == 'Food' %} bg-danger 

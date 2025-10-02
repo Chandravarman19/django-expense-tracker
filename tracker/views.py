@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Expense
 from .forms import ExpenseForm
 from django.contrib.auth import login
@@ -6,7 +6,6 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
-from bson import ObjectId   # ✅ for MongoDB IDs
 
 
 # ✅ List all expenses (with category + date filter)
@@ -15,15 +14,16 @@ def expense_list(request):
     category_filter = request.GET.get("category")
     date_filter = request.GET.get("date")
 
-    query = {"owner": request.user.username}
+    # Start with filtering by current user
+    expenses = Expense.objects.filter(owner=request.user)
 
     if category_filter:
-        query["category"] = category_filter
+        expenses = expenses.filter(category=category_filter)
 
     if date_filter:
-        query["date__gte"] = date_filter  # from that date onward
+        expenses = expenses.filter(date__gte=date_filter)
 
-    expenses = Expense.objects(**query).order_by('-date')
+    expenses = expenses.order_by('-date')
 
     return render(request, 'tracker/expense_list.html', {
         'expenses': expenses,
@@ -41,8 +41,8 @@ def add_expense(request):
             expense = Expense(
                 title=form.cleaned_data['title'],
                 amount=form.cleaned_data['amount'],
-                category=form.cleaned_data['category'],   # ✅ save category
-                owner=request.user.username
+                category=form.cleaned_data['category'],
+                owner=request.user   # ✅ must be User object
             )
             expense.save()
             return redirect('expense_list')
@@ -54,28 +54,21 @@ def add_expense(request):
 # ✅ Edit an existing expense
 @login_required
 def edit_expense(request, obj_id):
-    try:
-        expense = Expense.objects(id=ObjectId(obj_id), owner=request.user.username).first()
-    except Exception:
-        expense = None
-
-    if not expense:
-        messages.error(request, "❌ Expense not found or not yours!")
-        return redirect('expense_list')
+    expense = get_object_or_404(Expense, id=obj_id, owner=request.user)
 
     if request.method == "POST":
         form = ExpenseForm(request.POST)
         if form.is_valid():
             expense.title = form.cleaned_data['title']
             expense.amount = form.cleaned_data['amount']
-            expense.category = form.cleaned_data['category']  # ✅ update category
+            expense.category = form.cleaned_data['category']
             expense.save()
             return redirect('expense_list')
     else:
         form = ExpenseForm(initial={
             'title': expense.title,
             'amount': expense.amount,
-            'category': expense.category   # ✅ pre-fill category
+            'category': expense.category
         })
     return render(request, 'tracker/edit_expense.html', {'form': form})
 
@@ -83,29 +76,23 @@ def edit_expense(request, obj_id):
 # ✅ Delete an expense
 @login_required
 def delete_expense(request, obj_id):
-    try:
-        expense = Expense.objects(id=ObjectId(obj_id), owner=request.user.username).first()
-    except Exception:
-        expense = None
-
-    if not expense:
-        messages.error(request, "❌ Expense not found or not yours!")
-        return redirect('expense_list')
+    expense = get_object_or_404(Expense, id=obj_id, owner=request.user)
 
     if request.method == "POST":
         expense.delete()
         return redirect('expense_list')
+
     return render(request, 'tracker/delete_expense.html', {'expense': expense})
 
 
 # ✅ Monthly summary (category-based aggregation)
 @login_required
 def monthly_summary(request):
-    pipeline = [
-        {"$match": {"owner": request.user.username}},
-        {"$group": {"_id": "$category", "total": {"$sum": "$amount"}}}
-    ]
-    summary = list(Expense.objects.aggregate(*pipeline))
+    summary = (
+        Expense.objects.filter(owner=request.user)
+        .values('category')
+        .annotate(total=models.Sum('amount'))
+    )
 
     total_expenses = sum(item["total"] for item in summary) if summary else 0
 
