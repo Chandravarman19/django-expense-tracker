@@ -7,4 +7,6 @@ urlpatterns = [
     path('edit/<int:obj_id>/', views.edit_expense, name='edit_expense'),
     path('delete/<int:obj_id>/', views.delete_expense, name='delete_expense'),
     path('summary/', views.monthly_summary, name='monthly_summary'),
+    path('register/', views.register, name='register'),
+
 ]

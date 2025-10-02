@@ -1,28 +1,38 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Expense
 from .forms import ExpenseForm
-from django.http import HttpResponse
 from django.db.models import Sum
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 
-# List all expenses
+
+# ✅ List all expenses (only for logged-in user)
+@login_required
 def expense_list(request):
-    expenses = Expense.objects.all()
+    expenses = Expense.objects.filter(owner=request.user).order_by('-date')
     return render(request, 'tracker/expense_list.html', {'expenses': expenses})
 
-# Add a new expense
+
+# ✅ Add a new expense
+@login_required
 def add_expense(request):
     if request.method == "POST":
         form = ExpenseForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('expense_list')  # go back to list after saving
+            expense = form.save(commit=False)
+            expense.owner = request.user  # link expense to logged-in user
+            expense.save()
+            return redirect('expense_list')
     else:
         form = ExpenseForm()
     return render(request, 'tracker/add_expense.html', {'form': form})
 
-# ✅ Edit an existing expense
+
+# ✅ Edit an existing expense (only if user owns it)
+@login_required
 def edit_expense(request, obj_id):
-    expense = get_object_or_404(Expense, id=obj_id)
+    expense = get_object_or_404(Expense, id=obj_id, owner=request.user)
     if request.method == "POST":
         form = ExpenseForm(request.POST, instance=expense)
         if form.is_valid():
@@ -32,28 +42,44 @@ def edit_expense(request, obj_id):
         form = ExpenseForm(instance=expense)
     return render(request, 'tracker/edit_expense.html', {'form': form})
 
-# Delete placeholder (we’ll update next)
-# Delete an expense
+
+# ✅ Delete an expense (only if user owns it)
+@login_required
 def delete_expense(request, obj_id):
-    expense = get_object_or_404(Expense, id=obj_id)
+    expense = get_object_or_404(Expense, id=obj_id, owner=request.user)
     if request.method == "POST":
         expense.delete()
         return redirect('expense_list')
     return render(request, 'tracker/delete_expense.html', {'expense': expense})
 
 
-
-
-# ... your other functions ...
-
+# ✅ Monthly summary (only user’s data)
+@login_required
 def monthly_summary(request):
-    # Group expenses by category and sum amounts
-    summary = Expense.objects.values('title').annotate(total=Sum('amount'))
-
-    total_expenses = Expense.objects.aggregate(total=Sum('amount'))['total']
+    summary = (
+        Expense.objects.filter(owner=request.user)
+        .values('title')
+        .annotate(total=Sum('amount'))
+    )
+    total_expenses = (
+        Expense.objects.filter(owner=request.user)
+        .aggregate(total=Sum('amount'))['total']
+    )
 
     return render(request, 'tracker/monthly_summary.html', {
         'summary': summary,
         'total_expenses': total_expenses
     })
 
+
+# ✅ User Registration
+def register(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # auto login after signup
+            return redirect('expense_list')
+    else:
+        form = UserCreationForm()
+    return render(request, 'tracker/register.html', {'form': form})
