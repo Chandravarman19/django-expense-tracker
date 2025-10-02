@@ -20,7 +20,13 @@
                             <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
+
+                    <!-- ✅ Forgot password link -->
+                    <div class="text-center mt-3">
+                        <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary btn-sm">Forgot Password?</a>
+                    </div>
                 </div>
+
                 {% if messages %}
                 <div class="card-footer">
                     {% for message in messages %}
