@@ -15,11 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include   # include is for tracker.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('tracker.urls')),  # root goes to tracker app
-    path('accounts/', include('django.contrib.auth.urls')),
-
+    path('', include('tracker.urls')),   # connects to your tracker app
 ]

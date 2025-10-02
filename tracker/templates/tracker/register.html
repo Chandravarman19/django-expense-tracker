@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
-<head><title>Register</title></head>
+<head>
+    <title>Register</title>
+</head>
 <body>
-<h1>Register</h1>
+<h1>Create an Account</h1>
+
 <form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Sign Up</button>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
 </form>
-<a href="{% url 'login' %}">Already have an account? Login</a>
+
+<a href="{% url 'login' %}">Already have an account? Login here</a>
 </body>
 </html>

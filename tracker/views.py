@@ -5,7 +5,9 @@ from django.db.models import Sum
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-
+from django.contrib.auth import logout as auth_logout
+from django.shortcuts import redirect
+from django.contrib import messages
 
 # ✅ List all expenses (only for logged-in user)
 @login_required
@@ -73,13 +75,21 @@ def monthly_summary(request):
 
 
 # ✅ User Registration
+
+
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)  # auto login after signup
-            return redirect('expense_list')
+            form.save()
+            messages.success(request, "✅ Registration successful! Please log in.")
+            return redirect('login')   # go to login page after registration
     else:
         form = UserCreationForm()
     return render(request, 'tracker/register.html', {'form': form})
+
+
+
+def logout_view(request):
+    auth_logout(request)
+    return redirect('login')   # send user to the login page
