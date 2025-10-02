@@ -2,12 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Expense
 from .forms import ExpenseForm
 from django.db.models import Sum
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
-from django.shortcuts import redirect
 from django.contrib import messages
+
 
 # ✅ List all expenses (only for logged-in user)
 @login_required
@@ -75,21 +75,48 @@ def monthly_summary(request):
 
 
 # ✅ User Registration
-
-
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "✅ Registration successful! Please log in.")
-            return redirect('login')   # go to login page after registration
+            user = form.save()
+            login(request, user)
+
+            # ✅ If superuser → redirect to admin dashboard
+            if user.is_superuser:
+                messages.success(request, "Welcome Admin! Redirecting to Dashboard.")
+                return redirect('/admin/')
+
+            # ✅ Else normal user
+            messages.success(request, "✅ Registration successful! You are now logged in.")
+            return redirect('expense_list')
     else:
         form = UserCreationForm()
     return render(request, 'tracker/register.html', {'form': form})
 
 
-
+# ✅ Logout
 def logout_view(request):
     auth_logout(request)
-    return redirect('login')   # send user to the login page
+    return redirect('login')
+
+
+# ✅ Custom Login
+def custom_login(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+
+            # ✅ If superuser → go to Django Admin
+            if user.is_superuser:
+                return redirect('/admin/')
+
+            # ✅ Else → go to app
+            return redirect('expense_list')
+        else:
+            messages.error(request, "Invalid username or password")
+    else:
+        form = AuthenticationForm()
+    return render(request, "registration/login.html", {"form": form})

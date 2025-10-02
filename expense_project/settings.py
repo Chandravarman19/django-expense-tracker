@@ -135,4 +135,10 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_REDIRECT_URL = 'expense_list'   # after login, go to expense list
 LOGOUT_REDIRECT_URL = 'login'        # after logout, go back to login
+# Email backend for dev (shows reset link in terminal)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# For real Gmail setup ( I will do this later):
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
 

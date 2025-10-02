@@ -18,6 +18,15 @@
   <button type="submit">Login</button>
 </form>
 
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li style="color: green;">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+
 <a href="{% url 'register' %}">New user? Register here</a>
 </body>
 </html>
