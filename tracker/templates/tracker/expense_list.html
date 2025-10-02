@@ -8,11 +8,37 @@
     <a href="{% url 'add_expense' %}" class="btn btn-success">➕ Add Expense</a>
 </div>
 
+<!-- ✅ Filters -->
+<form method="get" class="mb-4 row g-2">
+    <!-- Category Filter -->
+    <div class="col-md-3">
+        <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            <option value="Food" {% if selected_category == "Food" %}selected{% endif %}>🍔 Food</option>
+            <option value="Travel" {% if selected_category == "Travel" %}selected{% endif %}>✈️ Travel</option>
+            <option value="Bills" {% if selected_category == "Bills" %}selected{% endif %}>💡 Bills</option>
+            <option value="Shopping" {% if selected_category == "Shopping" %}selected{% endif %}>🛍️ Shopping</option>
+            <option value="Other" {% if selected_category == "Other" %}selected{% endif %}>📦 Other</option>
+        </select>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="col-md-3">
+        <input type="date" name="date" value="{{ selected_date }}" class="form-control">
+    </div>
+
+    <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">🔍 Filter</button>
+        <a href="{% url 'expense_list' %}" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
 {% if expenses %}
 <table class="table table-hover shadow-sm">
     <thead class="table-dark">
         <tr>
             <th scope="col">Title</th>
+            <th scope="col">Category</th>
             <th scope="col">Amount (₹)</th>
             <th scope="col">Date</th>
             <th scope="col" class="text-center">Actions</th>
@@ -22,6 +48,17 @@
         {% for expense in expenses %}
         <tr>
             <td>{{ expense.title }}</td>
+            <td>
+                <span class="badge 
+                    {% if expense.category == 'Food' %} bg-danger 
+                    {% elif expense.category == 'Travel' %} bg-primary
+                    {% elif expense.category == 'Bills' %} bg-warning text-dark
+                    {% elif expense.category == 'Shopping' %} bg-success
+                    {% else %} bg-info text-dark
+                    {% endif %}">
+                    {{ expense.category }}
+                </span>
+            </td>
             <td class="fw-bold text-success">₹{{ expense.amount }}</td>
             <td>{{ expense.date|date:"M d, Y" }}</td>
             <td class="text-center">
