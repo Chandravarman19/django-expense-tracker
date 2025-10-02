@@ -1,32 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head><title>Login</title></head>
-<body>
-<h1>Login</h1>
+{% extends 'tracker/base.html' %}
 
-{% if messages %}
-  <ul>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+{% block title %}Login{% endblock %}
 
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white text-center">
+                    <h4>🔑 Login</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form.as_p }}
 
-{% if messages %}
-  <ul>
-    {% for message in messages %}
-      <li style="color: green;">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
-
-
-<a href="{% url 'register' %}">New user? Register here</a>
-</body>
-</html>
+                        <div class="d-flex justify-content-between mt-3">
+                            <a href="{% url 'register' %}" class="btn btn-link">📝 Register</a>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                </div>
+                {% if messages %}
+                <div class="card-footer">
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
