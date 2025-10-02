@@ -16,14 +16,16 @@
                         {{ form.as_p }}
 
                         <div class="d-flex justify-content-between mt-3">
-                            <a href="{% url 'register' %}" class="btn btn-link">📝 Register</a>
+                            <a href="{% url 'register' %}" class="btn btn-outline-success">📝 Register</a>
                             <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
 
                     <!-- ✅ Forgot password link -->
                     <div class="text-center mt-3">
-                        <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary btn-sm">Forgot Password?</a>
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                            ❓ Forgot your password?
+                        </a>
                     </div>
                 </div>
 
