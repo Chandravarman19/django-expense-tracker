@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Expense
-from .forms import ExpenseForm
+from .forms import ExpenseForm, CustomUserCreationForm   # ✅ custom register form
 from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
@@ -15,7 +15,6 @@ def expense_list(request):
     category_filter = request.GET.get("category")
     date_filter = request.GET.get("date")
 
-    # Start with filtering by current user
     expenses = Expense.objects.filter(owner=request.user)
 
     if category_filter:
@@ -39,9 +38,10 @@ def add_expense(request):
     if request.method == "POST":
         form = ExpenseForm(request.POST)
         if form.is_valid():
-            expense = form.save(commit=False)   # don’t save yet
-            expense.owner = request.user        # ✅ assign logged-in User object
+            expense = form.save(commit=False)
+            expense.owner = request.user
             expense.save()
+            messages.success(request, "✅ Expense added successfully!")
             return redirect('expense_list')
     else:
         form = ExpenseForm()
@@ -54,12 +54,13 @@ def edit_expense(request, obj_id):
     expense = get_object_or_404(Expense, id=obj_id, owner=request.user)
 
     if request.method == "POST":
-        form = ExpenseForm(request.POST, instance=expense)  # ✅ bind instance
+        form = ExpenseForm(request.POST, instance=expense)
         if form.is_valid():
             form.save()
+            messages.success(request, "✏️ Expense updated successfully!")
             return redirect('expense_list')
     else:
-        form = ExpenseForm(instance=expense)  # ✅ pre-fill form properly
+        form = ExpenseForm(instance=expense)
     return render(request, 'tracker/edit_expense.html', {'form': form})
 
 
@@ -70,6 +71,7 @@ def delete_expense(request, obj_id):
 
     if request.method == "POST":
         expense.delete()
+        messages.success(request, "🗑️ Expense deleted successfully!")
         return redirect('expense_list')
 
     return render(request, 'tracker/delete_expense.html', {'expense': expense})
@@ -80,8 +82,8 @@ def delete_expense(request, obj_id):
 def monthly_summary(request):
     summary = (
         Expense.objects.filter(owner=request.user)
-        .values('category')                 # group by category
-        .annotate(total=models.Sum('amount'))  # ✅ use models.Sum
+        .values('category')
+        .annotate(total=models.Sum('amount'))
     )
 
     total_expenses = (
@@ -95,22 +97,23 @@ def monthly_summary(request):
     })
 
 
-# ✅ User Registration
+# ✅ User Registration (with email support)
 def register(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "✅ Registration successful! Please log in.")
             return redirect('login')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'tracker/register.html', {'form': form})
 
 
 # ✅ Logout
 def logout_view(request):
     auth_logout(request)
+    messages.info(request, "🚪 You have been logged out.")
     return redirect('login')
 
 
@@ -122,11 +125,13 @@ def custom_login(request):
             user = form.get_user()
             login(request, user)
 
+            messages.success(request, f"👋 Welcome back, {user.username}!")
+
             if user.is_superuser:
                 return redirect('/admin/')
             return redirect('expense_list')
         else:
-            messages.error(request, "Invalid username or password")
+            messages.error(request, "❌ Invalid username or password")
     else:
         form = AuthenticationForm()
     return render(request, "registration/login.html", {"form": form})
