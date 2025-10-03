@@ -37,45 +37,51 @@
 </form>
 
 {% if expenses %}
-<table class="table table-hover shadow-sm">
-    <thead class="table-dark">
-        <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Category</th>
-            <th scope="col">Amount (₹)</th>
-            <th scope="col">Date</th>
-            <th scope="col" class="text-center">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for expense in expenses %}
-        <tr>
-            <td class="fw-bold">{{ expense.title }}</td>
-            <td>
-                <span class="badge 
-                    {% if expense.category == 'Food' %} bg-danger 
-                    {% elif expense.category == 'Travel' %} bg-primary
-                    {% elif expense.category == 'Bills' %} bg-warning text-dark
-                    {% elif expense.category == 'Shopping' %} bg-success
-                    {% else %} bg-info text-dark
-                    {% endif %}">
-                    {{ expense.category }}
-                </span>
-            </td>
-            <td class="fw-bold text-success">₹{{ expense.amount }}</td>
-            <td>{{ expense.date|date:"M d, Y" }}</td>
-            <td class="text-center">
-                <!-- ✅ Convert ObjectId to string -->
-                <a href="{% url 'edit_expense' expense.id|stringformat:'s' %}" class="btn btn-sm btn-warning me-2">✏️ Edit</a>
-                <a href="{% url 'delete_expense' expense.id|stringformat:'s' %}" class="btn btn-sm btn-danger">🗑️ Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-responsive shadow-sm">
+    <table class="table table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Category</th>
+                <th scope="col">Amount (₹)</th>
+                <th scope="col">Date</th>
+                <th scope="col" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td class="fw-bold">{{ expense.title }}</td>
+                <td>
+                    <span class="badge 
+                        {% if expense.category == 'Food' %} bg-danger 
+                        {% elif expense.category == 'Travel' %} bg-primary
+                        {% elif expense.category == 'Bills' %} bg-warning text-dark
+                        {% elif expense.category == 'Shopping' %} bg-success
+                        {% else %} bg-info text-dark
+                        {% endif %}">
+                        {{ expense.category }}
+                    </span>
+                </td>
+                <td class="fw-bold text-success">₹{{ expense.amount }}</td>
+                <td>{{ expense.date|date:"M d, Y" }}</td>
+                <td class="text-center">
+                    <a href="{% url 'edit_expense' expense.id %}" class="btn btn-sm btn-warning me-2" title="Edit Expense">
+                        ✏️ Edit
+                    </a>
+                    <a href="{% url 'delete_expense' expense.id %}" class="btn btn-sm btn-danger" title="Delete Expense">
+                        🗑️ Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-<div class="alert alert-info shadow-sm">
-    <strong>No expenses yet!</strong> Start by adding your first expense.
+<div class="alert alert-info shadow-sm text-center">
+    <h5 class="mb-1">📭 No expenses yet!</h5>
+    <p class="mb-0">Start by adding your first expense 👉 <a href="{% url 'add_expense' %}" class="btn btn-sm btn-success">➕ Add Expense</a></p>
 </div>
 {% endif %}
 

@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from datetime import datetime
+from django.utils import timezone   # better than datetime.now
 
 class Expense(models.Model):
     CATEGORY_CHOICES = [
@@ -13,7 +13,7 @@ class Expense(models.Model):
 
     title = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateField(default=datetime.now)
+    date = models.DateField(default=timezone.now)  # ✅ auto set today if not provided
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default="Other")
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,

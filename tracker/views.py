@@ -39,14 +39,9 @@ def add_expense(request):
     if request.method == "POST":
         form = ExpenseForm(request.POST)
         if form.is_valid():
-            expense = Expense(
-             title=form.cleaned_data['title'],
-             amount=form.cleaned_data['amount'],
-             category=form.cleaned_data['category'],
-              owner=request.user.username  # store username
-            )
+            expense = form.save(commit=False)   # don’t save yet
+            expense.owner = request.user        # ✅ assign logged-in User object
             expense.save()
-
             return redirect('expense_list')
     else:
         form = ExpenseForm()
@@ -59,19 +54,12 @@ def edit_expense(request, obj_id):
     expense = get_object_or_404(Expense, id=obj_id, owner=request.user)
 
     if request.method == "POST":
-        form = ExpenseForm(request.POST)
+        form = ExpenseForm(request.POST, instance=expense)  # ✅ bind instance
         if form.is_valid():
-            expense.title = form.cleaned_data['title']
-            expense.amount = form.cleaned_data['amount']
-            expense.category = form.cleaned_data['category']
-            expense.save()
+            form.save()
             return redirect('expense_list')
     else:
-        form = ExpenseForm(initial={
-            'title': expense.title,
-            'amount': expense.amount,
-            'category': expense.category
-        })
+        form = ExpenseForm(instance=expense)  # ✅ pre-fill form properly
     return render(request, 'tracker/edit_expense.html', {'form': form})
 
 
@@ -105,7 +93,6 @@ def monthly_summary(request):
         'summary': summary,
         'total_expenses': total_expenses
     })
-
 
 
 # ✅ User Registration
